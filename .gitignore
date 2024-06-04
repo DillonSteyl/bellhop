@@ -32,3 +32,9 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Ignore terraform lock file since we'll be running this from the cloud
+.terraform.lock.hcl
+
+# Ignore generated data
+*.zip
