@@ -1,2 +1,3 @@
-# websocket-signalling-server
-WebSocket signalling server deployed with AWS &amp; Terraform
+# Serverless Websocket Signalling API
+
+Serverless websocket signalling API deployed with AWS and Terraform.
