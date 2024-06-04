@@ -38,3 +38,15 @@ terraform.rc
 
 # Ignore generated data
 *.zip
+
+# Python
+.python-version
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
