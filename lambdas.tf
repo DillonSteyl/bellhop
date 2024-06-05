@@ -47,70 +47,20 @@ resource "aws_iam_role_policy_attachment" "dynamodbo_policy_attachment" {
   policy_arn = aws_iam_policy.websocket_dynamodb_policy.arn
 }
 
-data "archive_file" "on_connect_archive" {
-  type        = "zip"
-  source_file = "${path.module}/src/on_connect.py"
-  output_path = "on_connect_lambda.zip"
+module "on_connect_lambda" {
+  source              = "./modules/websocket_lambda"
+  python_filename     = "on_connect"
+  lambda_name         = "websocket-on-connect"
+  iam_role_arn        = aws_iam_role.lambda_iam_role.arn
+  execution_arn       = aws_apigatewayv2_api.websocket_api.execution_arn
+  dynamodb_table_name = aws_dynamodb_table.websocket_connections.name
 }
 
-resource "aws_lambda_function" "on_connect_lambda" {
-  filename      = data.archive_file.on_connect_archive.output_path
-  function_name = "websocket-on-connect"
-  role          = aws_iam_role.lambda_iam_role.arn
-
-  source_code_hash = data.archive_file.on_connect_archive.output_base64sha256
-
-  runtime = "python3.12"
-  handler = "on_connect.lambda_handler"
-
-  environment {
-    variables = {
-      TABLE_NAME = aws_dynamodb_table.websocket_connections.name
-    }
-  }
-}
-
-resource "aws_lambda_permission" "allow_on_connect_api" {
-  statement_id  = "AllowWebsocketInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.on_connect_lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  # The /* part allows invocation from any stage, method and resource path
-  # within API Gateway.
-  source_arn = "${aws_apigatewayv2_api.websocket_api.execution_arn}/*"
-}
-
-data "archive_file" "on_disconnect_archive" {
-  type        = "zip"
-  source_file = "${path.module}/src/on_disconnect.py"
-  output_path = "on_disconnect_lambda.zip"
-}
-
-resource "aws_lambda_function" "on_disconnect_lambda" {
-  filename      = data.archive_file.on_disconnect_archive.output_path
-  function_name = "websocket-on-disconnect"
-  role          = aws_iam_role.lambda_iam_role.arn
-
-  source_code_hash = data.archive_file.on_disconnect_archive.output_base64sha256
-
-  runtime = "python3.12"
-  handler = "on_disconnect.lambda_handler"
-
-  environment {
-    variables = {
-      TABLE_NAME = aws_dynamodb_table.websocket_connections.name
-    }
-  }
-}
-
-resource "aws_lambda_permission" "allow_on_disconnect_api" {
-  statement_id  = "AllowWebsocketInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.on_disconnect_lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  # The /* part allows invocation from any stage, method and resource path
-  # within API Gateway.
-  source_arn = "${aws_apigatewayv2_api.websocket_api.execution_arn}/*"
+module "on_disconnect_lambda" {
+  source              = "./modules/websocket_lambda"
+  python_filename     = "on_disconnect"
+  lambda_name         = "websocket-on-disconnect"
+  iam_role_arn        = aws_iam_role.lambda_iam_role.arn
+  execution_arn       = aws_apigatewayv2_api.websocket_api.execution_arn
+  dynamodb_table_name = aws_dynamodb_table.websocket_connections.name
 }
