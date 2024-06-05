@@ -4,7 +4,6 @@ resource "aws_dynamodb_table" "websocket_connections" {
     name = "connectionId"
     type = "S"
   }
-  hash_key       = "connectionId"
-  read_capacity  = 10
-  write_capacity = 10
+  hash_key     = "connectionId"
+  billing_mode = "PAY_PER_REQUEST"
 }
