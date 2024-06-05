@@ -26,7 +26,7 @@ resource "aws_apigatewayv2_integration" "connect_integration" {
 
   connection_type           = "INTERNET"
   content_handling_strategy = "CONVERT_TO_TEXT"
-  integration_uri           = aws_lambda_function.on_connect_lambda.invoke_arn
+  integration_uri           = module.on_connect_lambda.invoke_arn
   integration_method        = "POST"
 }
 
@@ -36,7 +36,7 @@ resource "aws_apigatewayv2_integration" "disconnect_integration" {
 
   connection_type           = "INTERNET"
   content_handling_strategy = "CONVERT_TO_TEXT"
-  integration_uri           = aws_lambda_function.on_disconnect_lambda.invoke_arn
+  integration_uri           = module.on_disconnect_lambda.invoke_arn
   integration_method        = "POST"
 }
 
