@@ -4,9 +4,23 @@ variable "src_path" {
   type        = string
 }
 
-variable "python_filename" {
+variable "handler_filename" {
   description = "Name of the python file (no extension)"
   type        = string
+  default     = "handlers"
+}
+
+variable "handler_function_name" {
+  description = "Name of the handler function in the python file"
+  type        = string
+}
+
+variable "archive_folder" {
+  description = "Archive file containing the lambda function code"
+  type = object({
+    output_path         = string
+    output_base64sha256 = string
+  })
 }
 
 variable "lambda_name" {
