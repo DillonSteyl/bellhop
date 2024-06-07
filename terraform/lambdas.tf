@@ -50,7 +50,7 @@ resource "aws_iam_role_policy_attachment" "dynamodbo_policy_attachment" {
 data "archive_file" "lambda_archive" {
   type        = "zip"
   output_path = "lambda.zip"
-  source_dir  = "../src"
+  source_dir  = "../bellhop/src"
 }
 
 module "on_connect_lambda" {

@@ -1,9 +1,3 @@
-variable "src_path" {
-  default     = "../src"
-  description = "The path to the source file to be zipped"
-  type        = string
-}
-
 variable "handler_filename" {
   description = "Name of the python file (no extension)"
   type        = string
