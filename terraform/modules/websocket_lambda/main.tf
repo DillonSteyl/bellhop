@@ -10,7 +10,8 @@ resource "aws_lambda_function" "lambda" {
 
   environment {
     variables = {
-      TABLE_NAME = var.dynamodb_table_name
+      TABLE_NAME           = var.dynamodb_table_name
+      DEPLOYED_ENVIRONMENT = var.deployed_environment
     }
   }
 }

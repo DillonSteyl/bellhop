@@ -36,3 +36,9 @@ variable "dynamodb_table_name" {
   description = "Name of the DynamoDB table"
   type        = string
 }
+
+variable "deployed_environment" {
+  description = "The environment the lambda function is deployed to"
+  type        = string
+  default     = "production"
+}
