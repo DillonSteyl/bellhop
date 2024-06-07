@@ -1,5 +1,5 @@
 variable "src_path" {
-  default     = "src"
+  default     = "../src"
   description = "The path to the source file to be zipped"
   type        = string
 }
