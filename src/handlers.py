@@ -1,7 +1,7 @@
 from utils import connections
 
 
-def on_connect_handler(event, context):
+def on_connect(event, context):
     """
     Handles new connections - inserting a row into DynamoDB
     """
@@ -10,7 +10,7 @@ def on_connect_handler(event, context):
     return {}
 
 
-def on_disconnect_handler(event, context):
+def on_disconnect(event, context):
     """
     Handles disconnections - deleting a row from DynamoDB
     """
