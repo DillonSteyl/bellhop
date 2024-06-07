@@ -1,18 +1,12 @@
-data "archive_file" "lambda_archive" {
-  type        = "zip"
-  source_file = "./${var.src_path}/${var.python_filename}.py"
-  output_path = "${var.python_filename}.zip"
-}
-
 resource "aws_lambda_function" "lambda" {
-  filename      = data.archive_file.lambda_archive.output_path
+  filename      = var.archive_folder.output_path
   function_name = var.lambda_name
   role          = var.iam_role_arn
 
-  source_code_hash = data.archive_file.lambda_archive.output_base64sha256
+  source_code_hash = var.archive_folder.output_base64sha256
 
   runtime = "python3.12"
-  handler = "${var.python_filename}.lambda_handler"
+  handler = "${var.handler_filename}.${var.handler_function_name}"
 
   environment {
     variables = {
