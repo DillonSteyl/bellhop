@@ -22,5 +22,4 @@ A [localstack](https://www.localstack.cloud) container is used to emulate portio
   >>> dynamo.list_tables()["TableNames"]
   ['WebsocketConnections']
   ```
-
-In future this could be used to set up automated tests, but right now it mainly serves as a means for manual testing.
+- `docker compose run bellhop pytest` will run the automated tests against the localstack.
