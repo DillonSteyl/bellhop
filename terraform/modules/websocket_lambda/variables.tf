@@ -42,3 +42,9 @@ variable "deployed_environment" {
   type        = string
   default     = "production"
 }
+
+variable "lambda_layers" {
+  description = "List of ARNs of the lambda layers to attach to the lambda function"
+  type        = list(string)
+  default     = []
+}

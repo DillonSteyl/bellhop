@@ -7,6 +7,8 @@ resource "aws_lambda_function" "lambda" {
 
   runtime = "python3.12"
   handler = "${var.handler_filename}.${var.handler_function_name}"
+  
+  layers = var.lambda_layers
 
   environment {
     variables = {
