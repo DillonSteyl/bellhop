@@ -1,8 +1,6 @@
-import json
 import uuid
 
-from core.payloads import EventType, generate_lobby_started_event
-from mypy_boto3_apigatewaymanagementapi import ApiGatewayManagementApiClient
+from core.payloads import generate_lobby_started_event
 
 from .services import TABLE_NAME, get_db
 
@@ -23,7 +21,7 @@ def remove_connection(connection_id: str) -> None:
 
 def start_lobby(
     connection_id: str,
-    management_api_client: ApiGatewayManagementApiClient,
+    management_api_client,
 ) -> None:
     """
     Sets the given connection as a lobby host.
