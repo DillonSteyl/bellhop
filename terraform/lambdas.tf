@@ -22,7 +22,10 @@ data "aws_iam_policy_document" "dynamodb_policy_doc" {
       "dynamodb:Query",
       "dynamodb:UpdateItem",
     ]
-    resources = [aws_dynamodb_table.websocket_connections.arn]
+    resources = [
+      aws_dynamodb_table.websocket_connections.arn,
+      "${aws_dynamodb_table.websocket_connections.arn}/*"
+    ]
   }
 }
 
