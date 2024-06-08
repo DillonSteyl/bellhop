@@ -40,6 +40,16 @@ resource "aws_apigatewayv2_integration" "disconnect_integration" {
   integration_method        = "POST"
 }
 
+resource "aws_apigatewayv2_integration" "default_integration" {
+  api_id           = aws_apigatewayv2_api.websocket_api.id
+  integration_type = "AWS_PROXY"
+
+  connection_type           = "INTERNET"
+  content_handling_strategy = "CONVERT_TO_TEXT"
+  integration_uri           = module.handle_payload_lambda.invoke_arn
+  integration_method        = "POST"
+}
+
 // Routes
 resource "aws_apigatewayv2_route" "connect_route" {
   api_id    = aws_apigatewayv2_api.websocket_api.id
@@ -51,4 +61,10 @@ resource "aws_apigatewayv2_route" "disconnect_route" {
   api_id    = aws_apigatewayv2_api.websocket_api.id
   route_key = "$disconnect"
   target    = "integrations/${aws_apigatewayv2_integration.disconnect_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "default_route" {
+  api_id    = aws_apigatewayv2_api.websocket_api.id
+  route_key = "$default"
+  target    = "integrations/${aws_apigatewayv2_integration.default_integration.id}"
 }

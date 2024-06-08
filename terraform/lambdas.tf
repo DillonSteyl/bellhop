@@ -72,3 +72,13 @@ module "on_disconnect_lambda" {
   execution_arn         = aws_apigatewayv2_api.websocket_api.execution_arn
   dynamodb_table_name   = aws_dynamodb_table.websocket_connections.name
 }
+
+module "handle_payload_lambda" {
+  source                = "./modules/websocket_lambda"
+  handler_function_name = "handle_payload"
+  lambda_name           = "websocket-handle-payload"
+  archive_folder        = data.archive_file.lambda_archive
+  iam_role_arn          = aws_iam_role.lambda_iam_role.arn
+  execution_arn         = aws_apigatewayv2_api.websocket_api.execution_arn
+  dynamodb_table_name   = aws_dynamodb_table.websocket_connections.name
+}

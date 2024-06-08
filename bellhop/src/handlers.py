@@ -17,3 +17,12 @@ def on_disconnect(event, context):
     connection_id = event["requestContext"]["connectionId"]
     connections.remove_connection(connection_id)
     return {}
+
+
+def handle_payload(event, context):
+    """
+    Generic handler for websocket requests
+    """
+    print(event)
+    print(context)
+    return {}
