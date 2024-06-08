@@ -29,7 +29,7 @@ def generate_lobby_started_event(lobby_id: str) -> str:
     return json.dumps(
         {
             "event": EventType.LOBBY_STARTED,
-            "content": {"lobbyId": lobby_id},
+            "content": {"lobby_id": lobby_id},
         }
     )
 
@@ -38,6 +38,6 @@ def generate_received_join_request_event(requesting_player_connection_id: str) -
     return json.dumps(
         {
             "event": EventType.RECEIVED_JOIN_REQUEST,
-            "content": {"connectionId": requesting_player_connection_id},
+            "content": {"connection_id": requesting_player_connection_id},
         }
     )
