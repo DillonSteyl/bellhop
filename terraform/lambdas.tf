@@ -37,7 +37,7 @@ resource "aws_iam_role" "lambda_iam_role" {
   assume_role_policy = data.aws_iam_policy_document.websocket_assume_role.json
 }
 
-resource "aws_iam_role_policy_attachment" "terraform_lambda_policy" {
+resource "aws_iam_role_policy_attachment" "lambda_execution_role" {
   role       = aws_iam_role.lambda_iam_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
@@ -47,11 +47,16 @@ resource "aws_iam_role_policy_attachment" "dynamodbo_policy_attachment" {
   policy_arn = aws_iam_policy.websocket_dynamodb_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "api_invoke" {
+  role       = aws_iam_role.lambda_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess"
+}
+
 data "archive_file" "lambda_archive" {
   type        = "zip"
   output_path = "lambda.zip"
   source_dir  = "../bellhop/src"
-  excludes = ["tests"]
+  excludes    = ["tests"]
 }
 
 module "on_connect_lambda" {
