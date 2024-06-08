@@ -51,6 +51,7 @@ data "archive_file" "lambda_archive" {
   type        = "zip"
   output_path = "lambda.zip"
   source_dir  = "../bellhop/src"
+  excludes = ["tests"]
 }
 
 module "on_connect_lambda" {
