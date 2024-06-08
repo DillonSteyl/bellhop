@@ -17,9 +17,13 @@ A [localstack](https://www.localstack.cloud) container is used to emulate portio
 - `docker compose up localstack-setup` will spin up the `localstack` and `localstack-setup` containers. The `setup` container uses the [tflocal wrapper script](https://docs.localstack.cloud/user-guide/integrations/terraform/#tflocal-wrapper-script) to spin up a subset of the AWS services which can be tested against.
 - `docker compose run bellhop bash` will shell into a container containing the `bellhop` source code. You can then open a python terminal and run code against the local `dynamodb` instance, for example:
   ```py
-  >>> from utils import connections, db
-  >>> dynamo = db.get_db()
+  >>> from core import services, actions
+  >>> from tests import utils
+  >>> dynamo = services.get_db()
   >>> dynamo.list_tables()["TableNames"]
   ['WebsocketConnections']
+  >>> actions.add_connection("some-connection-id")
+  >>> utils.get_all_dynamo_items(dynamo)
+  [{'connectionId': {'S': 'some-connection-id'}}]
   ```
 - `docker compose run bellhop pytest` will run the automated tests against the localstack.
