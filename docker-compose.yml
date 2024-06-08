@@ -21,11 +21,8 @@ services:
       dockerfile: Dockerfile
       args:
         - TERRAFORM_VERSION=1.8.5
-    environment:
-      - AWS_ENDPOINT_URL=http://localstack:4566
-      - AWS_DEFAULT_REGION=ap-southeast-2
-      - AWS_ACCESS_KEY_ID=123
-      - AWS_SECRET_ACCESS_KEY=123456789
+    env_file:
+      - ./localstack.env
     volumes:
       - ./bellhop:/usr/src/bellhop
       - ./terraform:/usr/src/terraform
@@ -34,9 +31,9 @@ services:
       - -c
       - "
         cd /usr/src/terraform && \
-        terraform init && \
-        terraform apply -auto-approve \
-        --target=aws_dynamodb_table.websocket_connections
+        tflocal init && \
+        tflocal apply -auto-approve \
+        $${LOCALSTACK_RESOURCES}
         "
 
   bellhop:
