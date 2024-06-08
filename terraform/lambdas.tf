@@ -57,6 +57,7 @@ module "on_connect_lambda" {
   source                = "./modules/websocket_lambda"
   handler_function_name = "on_connect"
   lambda_name           = "websocket-on-connect"
+  lambda_layers         = ["arn:aws:lambda:${local.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:71"]
   archive_folder        = data.archive_file.lambda_archive
   iam_role_arn          = aws_iam_role.lambda_iam_role.arn
   execution_arn         = aws_apigatewayv2_api.websocket_api.execution_arn
@@ -67,6 +68,7 @@ module "on_disconnect_lambda" {
   source                = "./modules/websocket_lambda"
   handler_function_name = "on_disconnect"
   lambda_name           = "websocket-on-disconnect"
+  lambda_layers         = ["arn:aws:lambda:${local.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:71"]
   archive_folder        = data.archive_file.lambda_archive
   iam_role_arn          = aws_iam_role.lambda_iam_role.arn
   execution_arn         = aws_apigatewayv2_api.websocket_api.execution_arn
@@ -77,6 +79,7 @@ module "handle_payload_lambda" {
   source                = "./modules/websocket_lambda"
   handler_function_name = "handle_payload"
   lambda_name           = "websocket-handle-payload"
+  lambda_layers         = ["arn:aws:lambda:${local.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:71"]
   archive_folder        = data.archive_file.lambda_archive
   iam_role_arn          = aws_iam_role.lambda_iam_role.arn
   execution_arn         = aws_apigatewayv2_api.websocket_api.execution_arn
