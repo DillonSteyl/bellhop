@@ -17,9 +17,14 @@ def get_db():
     return boto3.client("dynamodb")
 
 
-def get_management_api_client():
+def get_management_api_client(
+    domain_name: str = "",
+    stage: str = "",
+):
     if DEPLOYED_ENVIRONMENT == "local":
         # localstack requires pro account to deploy api gateway v2
         return MagicMock()
 
-    return boto3.client("apigatewaymanagementapi")
+    return boto3.client(
+        "apigatewaymanagementapi", endpoint_url=f"https://{domain_name}/{stage}"
+    )

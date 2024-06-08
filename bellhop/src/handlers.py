@@ -29,14 +29,16 @@ def handle_payload(event: APIGatewayProxyEvent, context: LambdaContext):
     """
     Generic handler for websocket requests
     """
-    connection_id = event.request_context.connection_id
     payload = payloads.WebsocketPayload(**event.json_body)
 
     match payload.action:
         case payloads.ActionType.START_LOBBY:
             actions.start_lobby(
-                connection_id,
-                services.get_management_api_client(),
+                event.request_context.connection_id,
+                services.get_management_api_client(
+                    domain_name=event.request_context.domain_name,
+                    stage=event.request_context.stage,
+                ),
             )
         case _:
             raise RuntimeError(f"Unknown action: {payload.action}")
