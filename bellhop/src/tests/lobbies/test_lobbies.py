@@ -103,12 +103,16 @@ class TestJoinRequestResponses:
         actions.start_lobby(host_connection, management_api_client)
 
         player_connection = "playerConnection"
+        peer_id = 2
         actions.accept_join_request(
-            player_connection, host_connection, management_api_client
+            player_connection_id=player_connection,
+            host_connection_id=host_connection,
+            peer_id=peer_id,
+            management_api_client=management_api_client,
         )
 
         expected_accept_event = payloads.generate_join_request_accepted_event(
-            host_connection
+            host_connection, peer_id
         )
         management_api_client.post_to_connection.assert_called_with(
             ConnectionId=player_connection, Data=expected_accept_event

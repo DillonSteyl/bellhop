@@ -99,12 +99,15 @@ def request_join_lobby(
 def accept_join_request(
     player_connection_id: str,
     host_connection_id: str,
+    peer_id: int,
     management_api_client,
 ) -> None:
     """
     Accepts a join request from a player.
     """
-    event_data = payloads.generate_join_request_accepted_event(host_connection_id)
+    event_data = payloads.generate_join_request_accepted_event(
+        host_connection_id=host_connection_id, peer_id=peer_id
+    )
     management_api_client.post_to_connection(
         ConnectionId=player_connection_id,
         Data=event_data,

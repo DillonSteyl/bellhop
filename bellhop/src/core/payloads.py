@@ -36,6 +36,7 @@ class JoinLobbyContent:
 @dataclass
 class AcceptJoinRequestContent:
     player_connection_id: str
+    player_peer_id: int
 
 
 @dataclass
@@ -77,11 +78,11 @@ def generate_received_join_request_event(requesting_player_connection_id: str) -
     )
 
 
-def generate_join_request_accepted_event(host_connection_id: str) -> str:
+def generate_join_request_accepted_event(host_connection_id: str, peer_id: int) -> str:
     return json.dumps(
         {
             "event": EventType.JOIN_REQUEST_ACCEPTED,
-            "content": {"host_connection_id": host_connection_id},
+            "content": {"host_connection_id": host_connection_id, "peer_id": peer_id},
         }
     )
 
