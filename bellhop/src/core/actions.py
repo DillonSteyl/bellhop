@@ -127,3 +127,47 @@ def reject_join_request(
         ConnectionId=player_connection_id,
         Data=event_data,
     )
+
+
+def send_session_description(
+    source_connection_id: str,
+    target_connection_id: str,
+    session_type: str,
+    sdp: str,
+    management_api_client,
+) -> None:
+    """
+    Sends a session description to a connection.
+    """
+    event_data = payloads.generate_received_session_description_event(
+        connection_id=source_connection_id,
+        session_type=session_type,
+        sdp=sdp,
+    )
+    management_api_client.post_to_connection(
+        ConnectionId=target_connection_id,
+        Data=event_data,
+    )
+
+
+def send_ice_candidate(
+    source_connection_id: str,
+    target_connection_id: str,
+    media: str,
+    index: int,
+    name: str,
+    management_api_client,
+) -> None:
+    """
+    Sends an ice candidate to a connection.
+    """
+    event_data = payloads.generate_received_ice_candidate_event(
+        connection_id=source_connection_id,
+        media=media,
+        index=index,
+        name=name,
+    )
+    management_api_client.post_to_connection(
+        ConnectionId=target_connection_id,
+        Data=event_data,
+    )
