@@ -7,11 +7,15 @@ from typing import Optional
 class ActionType(StrEnum):
     START_LOBBY = "start_lobby"
     JOIN_LOBBY = "join_lobby"
+    ACCEPT_JOIN_REQUEST = "accept_join_request"
+    REJECT_JOIN_REQUEST = "reject_join_request"
 
 
 class EventType(StrEnum):
     LOBBY_STARTED = "lobby_started"
     RECEIVED_JOIN_REQUEST = "received_join_request"
+    JOIN_REQUEST_ACCEPTED = "join_request_accepted"
+    JOIN_REQUEST_REJECTED = "join_request_rejected"
 
 
 @dataclass
@@ -23,6 +27,17 @@ class WebsocketPayload:
 @dataclass
 class JoinLobbyContent:
     lobby_id: str
+
+
+@dataclass
+class AcceptJoinRequestContent:
+    player_connection_id: str
+
+
+@dataclass
+class RejectJoinRequestContent:
+    player_connection_id: str
+    reason: str
 
 
 def generate_lobby_started_event(lobby_id: str) -> str:
@@ -39,5 +54,23 @@ def generate_received_join_request_event(requesting_player_connection_id: str) -
         {
             "event": EventType.RECEIVED_JOIN_REQUEST,
             "content": {"connection_id": requesting_player_connection_id},
+        }
+    )
+
+
+def generate_join_request_accepted_event(host_connection_id: str) -> str:
+    return json.dumps(
+        {
+            "event": EventType.JOIN_REQUEST_ACCEPTED,
+            "content": {"host_connection_id": host_connection_id},
+        }
+    )
+
+
+def generate_join_request_rejected_event(host_connection_id: str, reason: str) -> str:
+    return json.dumps(
+        {
+            "event": EventType.JOIN_REQUEST_REJECTED,
+            "content": {"host_connection_id": host_connection_id, "reason": reason},
         }
     )

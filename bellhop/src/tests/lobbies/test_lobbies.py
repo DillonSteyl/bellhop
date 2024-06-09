@@ -87,3 +87,57 @@ class TestJoinLobby:
             actions.request_join_lobby(
                 "guestConnection2", lobby_id, management_api_client
             )
+
+
+class TestJoinRequestResponses:
+    def test_accept_join_request(
+        self,
+        dynamo_client: DynamoDBClient,
+        management_api_client: MagicMock,
+    ):
+        """
+        Test that accepting a join request sends a 'join request accepted' event to the player
+        attempting to connect.
+        """
+        host_connection = "hostConnection"
+        actions.start_lobby(host_connection, management_api_client)
+
+        player_connection = "playerConnection"
+        actions.accept_join_request(
+            player_connection, host_connection, management_api_client
+        )
+
+        expected_accept_event = payloads.generate_join_request_accepted_event(
+            host_connection
+        )
+        management_api_client.post_to_connection.assert_called_with(
+            ConnectionId=player_connection, Data=expected_accept_event
+        )
+
+    def test_reject_join_request(
+        self,
+        dynamo_client: DynamoDBClient,
+        management_api_client: MagicMock,
+    ):
+        """
+        Test that rejecting a join request sends a 'join request rejected' event to the player
+        attempting to connect.
+        """
+        host_connection = "hostConnection"
+        actions.start_lobby(host_connection, management_api_client)
+
+        player_connection = "playerConnection"
+        reason = "because I can"
+        actions.reject_join_request(
+            player_connection_id=player_connection,
+            host_connection_id=host_connection,
+            reason="because I can",
+            management_api_client=management_api_client,
+        )
+
+        expected_reject_event = payloads.generate_join_request_rejected_event(
+            host_connection, reason
+        )
+        management_api_client.post_to_connection.assert_called_with(
+            ConnectionId=player_connection, Data=expected_reject_event
+        )

@@ -94,3 +94,36 @@ def request_join_lobby(
         ConnectionId=host_id,
         Data=event_data,
     )
+
+
+def accept_join_request(
+    player_connection_id: str,
+    host_connection_id: str,
+    management_api_client,
+) -> None:
+    """
+    Accepts a join request from a player.
+    """
+    event_data = payloads.generate_join_request_accepted_event(host_connection_id)
+    management_api_client.post_to_connection(
+        ConnectionId=player_connection_id,
+        Data=event_data,
+    )
+
+
+def reject_join_request(
+    player_connection_id: str,
+    host_connection_id: str,
+    reason: str,
+    management_api_client,
+) -> None:
+    """
+    Rejects a join request from a player.
+    """
+    event_data = payloads.generate_join_request_rejected_event(
+        host_connection_id=host_connection_id, reason=reason
+    )
+    management_api_client.post_to_connection(
+        ConnectionId=player_connection_id,
+        Data=event_data,
+    )
