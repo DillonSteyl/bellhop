@@ -2,8 +2,6 @@
   <img src="docs/bellhop_title_transparent.png" width="600">
 </p>
 
-⚠️ **UNDER CONSTRUCTION** ⚠️
-
 **Bellhop** is a serverless WebSocket API for managing P2P game lobbies - it acts as a WebRTC signalling server, allowing players to exchange SDP messages and ICE candidates to establish direct connections with one another.
 
 ### Contents
