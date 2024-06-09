@@ -38,20 +38,35 @@ def handle_payload(event: APIGatewayProxyEvent, context: LambdaContext):
         domain_name=event.request_context.domain_name or "",
         stage=event.request_context.stage,
     )
+    content = payload.content or {}
 
     match payload.action:
         case payloads.ActionType.START_LOBBY:
             actions.start_lobby(
-                connection_id,
-                management_api_client,
+                connection_id=connection_id,
+                management_api_client=management_api_client,
             )
         case payloads.ActionType.JOIN_LOBBY:
-            content = payload.content or {}
-            payload_content = payloads.JoinLobbyContent(**content)
+            join_lobby_content = payloads.JoinLobbyContent(**content)
             actions.request_join_lobby(
-                connection_id,
-                payload_content.lobby_id,
-                management_api_client,
+                connection_id=connection_id,
+                lobby_id=join_lobby_content.lobby_id,
+                management_api_client=management_api_client,
+            )
+        case payloads.ActionType.ACCEPT_JOIN_REQUEST:
+            accept_join_content = payloads.AcceptJoinRequestContent(**content)
+            actions.accept_join_request(
+                player_connection_id=accept_join_content.player_connection_id,
+                host_connection_id=connection_id,
+                management_api_client=management_api_client,
+            )
+        case payloads.ActionType.REJECT_JOIN_REQUEST:
+            reject_join_content = payloads.RejectJoinRequestContent(**content)
+            actions.reject_join_request(
+                player_connection_id=reject_join_content.player_connection_id,
+                host_connection_id=connection_id,
+                reason=reject_join_content.reason,
+                management_api_client=management_api_client,
             )
         case _:
             raise RuntimeError(f"Unknown action: {payload.action}")
