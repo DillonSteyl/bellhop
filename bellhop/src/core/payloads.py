@@ -19,7 +19,7 @@ class EventType(StrEnum):
     JOIN_REQUEST_ACCEPTED = "join_request_accepted"
     JOIN_REQUEST_REJECTED = "join_request_rejected"
     RECEIVED_SESSION_DESCRIPTION = "received_session_description"
-    RECEIVED_ICE_CANDIDATE = "received_session_description"
+    RECEIVED_ICE_CANDIDATE = "received_ice_candidate"
 
 
 @dataclass
