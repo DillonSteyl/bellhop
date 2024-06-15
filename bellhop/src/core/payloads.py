@@ -88,11 +88,11 @@ def generate_join_request_accepted_event(host_connection_id: str, peer_id: int) 
     )
 
 
-def generate_join_request_rejected_event(host_connection_id: str, reason: str) -> str:
+def generate_join_request_rejected_event(reason: str) -> str:
     return json.dumps(
         {
             "event": EventType.JOIN_REQUEST_REJECTED,
-            "content": {"host_connection_id": host_connection_id, "reason": reason},
+            "content": {"reason": reason},
         }
     )
 

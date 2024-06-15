@@ -67,7 +67,6 @@ def handle_payload(event: APIGatewayProxyEvent, context: LambdaContext):
             reject_join_content = payloads.RejectJoinRequestContent(**content)
             actions.reject_join_request(
                 player_connection_id=reject_join_content.player_connection_id,
-                host_connection_id=source_connection_id,
                 reason=reject_join_content.reason,
                 management_api_client=management_api_client,
             )
