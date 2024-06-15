@@ -46,6 +46,8 @@ def handle_payload(event: APIGatewayProxyEvent, context: LambdaContext):
                 connection_id=source_connection_id,
                 management_api_client=management_api_client,
             )
+        case payloads.ActionType.CLOSE_LOBBY:
+            actions.close_lobby(connection_id=source_connection_id)
         case payloads.ActionType.JOIN_LOBBY:
             join_lobby_content = payloads.JoinLobbyContent(**content)
             actions.request_join_lobby(

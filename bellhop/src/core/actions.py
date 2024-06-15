@@ -51,6 +51,21 @@ def start_lobby(
     return lobby_id
 
 
+def close_lobby(
+    connection_id: str,
+) -> None:
+    """
+    Closes the lobby for the given connection ID.
+    """
+    dynamo_db = get_db()
+
+    dynamo_db.update_item(
+        TableName=TABLE_NAME,
+        Key={"connectionId": {"S": connection_id}},
+        UpdateExpression=f"REMOVE lobbyId, isHost",
+    )
+
+
 def request_join_lobby(
     connection_id: str,
     lobby_id: str,
