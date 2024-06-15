@@ -35,6 +35,29 @@ def test_start_lobby(
     )
 
 
+def test_close_lobby(
+    dynamo_client: DynamoDBClient,
+    management_api_client: MagicMock,
+):
+    """
+    Test that closing a lobby removes the lobby ID and host status from the connection.
+    """
+    connection_id = "myConnection"
+    actions.add_connection(connection_id)
+    created_lobby_id = actions.start_lobby(connection_id, management_api_client)
+
+    items = utils.get_all_dynamo_items(dynamo_client)
+    assert len(items) == 1
+    assert items[0]["lobbyId"]["S"] == created_lobby_id
+    assert items[0]["isHost"]["BOOL"]
+
+    actions.close_lobby(connection_id)
+    items = utils.get_all_dynamo_items(dynamo_client)
+    assert len(items) == 1
+    assert "lobbyId" not in items[0]
+    assert "isHost" not in items[0]
+
+
 class TestJoinLobby:
     def test_join_lobby(
         self,

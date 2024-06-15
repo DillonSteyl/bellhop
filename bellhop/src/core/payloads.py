@@ -6,6 +6,7 @@ from typing import Optional
 
 class ActionType(StrEnum):
     START_LOBBY = "start_lobby"
+    CLOSE_LOBBY = "close_lobby"
     JOIN_LOBBY = "join_lobby"
     ACCEPT_JOIN_REQUEST = "accept_join_request"
     REJECT_JOIN_REQUEST = "reject_join_request"
