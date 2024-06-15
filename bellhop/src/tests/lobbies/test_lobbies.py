@@ -157,14 +157,11 @@ class TestJoinRequestResponses:
         reason = "because I can"
         actions.reject_join_request(
             player_connection_id=player_connection,
-            host_connection_id=host_connection,
             reason="because I can",
             management_api_client=management_api_client,
         )
 
-        expected_reject_event = payloads.generate_join_request_rejected_event(
-            host_connection, reason
-        )
+        expected_reject_event = payloads.generate_join_request_rejected_event(reason)
         management_api_client.post_to_connection.assert_called_with(
             ConnectionId=player_connection, Data=expected_reject_event
         )

@@ -131,7 +131,6 @@ def accept_join_request(
 
 def reject_join_request(
     player_connection_id: str,
-    host_connection_id: str,
     reason: str,
     management_api_client,
 ) -> None:
@@ -139,7 +138,7 @@ def reject_join_request(
     Rejects a join request from a player.
     """
     event_data = payloads.generate_join_request_rejected_event(
-        host_connection_id=host_connection_id, reason=reason
+        reason=reason
     )
     management_api_client.post_to_connection(
         ConnectionId=player_connection_id,
