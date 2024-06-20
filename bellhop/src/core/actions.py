@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 
 from core import payloads
 
@@ -22,16 +23,35 @@ def remove_connection(connection_id: str) -> None:
 def start_lobby(
     connection_id: str,
     management_api_client,
-) -> str:
+    lobby_id: Optional[str] = None,
+) -> Optional[str]:
     """
     Sets the given connection as a lobby host.
     Triggers a message to the host with the created lobby ID.
 
-    Returns the lobby ID.
+    Returns the created lobby ID.
     """
     dynamo_db = get_db()
 
-    lobby_id = str(uuid.uuid4())
+    if lobby_id:
+        matching_lobbies = dynamo_db.query(
+            TableName=TABLE_NAME,
+            IndexName="lobbyIndex",
+            KeyConditionExpression="lobbyId = :lobby_id",
+            ExpressionAttributeValues={":lobby_id": {"S": lobby_id}},
+        )
+        if matching_lobbies["Items"]:
+            management_api_client.post_to_connection(
+                ConnectionId=connection_id,
+                Data=payloads.generate_lobby_creation_failed_event(
+                    f"Lobby {lobby_id} already exists."
+                ),
+            )
+            return None
+
+    if not lobby_id:
+        lobby_id = str(uuid.uuid4())
+
     dynamo_db.update_item(
         TableName=TABLE_NAME,
         Key={"connectionId": {"S": connection_id}},
@@ -82,7 +102,7 @@ def request_join_lobby(
         KeyConditionExpression="lobbyId = :lobby_id",
         ExpressionAttributeValues={":lobby_id": {"S": lobby_id}},
     )
-    if not lobby_connections:
+    if not lobby_connections["Items"]:
         raise RuntimeError(f"Lobby {lobby_id} not found.")
 
     host_id = None
@@ -137,9 +157,7 @@ def reject_join_request(
     """
     Rejects a join request from a player.
     """
-    event_data = payloads.generate_join_request_rejected_event(
-        reason=reason
-    )
+    event_data = payloads.generate_join_request_rejected_event(reason=reason)
     management_api_client.post_to_connection(
         ConnectionId=player_connection_id,
         Data=event_data,
