@@ -6,56 +6,122 @@ from mypy_boto3_dynamodb import DynamoDBClient
 from tests import utils
 
 
-def test_start_lobby(
-    dynamo_client: DynamoDBClient,
-    management_api_client: MagicMock,
-):
+class TestManageLobby:
     """
-    Test that starting a lobby sets the connection as a host and sends a 'lobby started' event
-    back to the host.
+    Tests for creating & closing lobbies
     """
-    connection_id = "myConnection"
 
-    actions.add_connection(connection_id)
-    items = utils.get_all_dynamo_items(dynamo_client)
-    assert len(items) == 1
-    assert items[0]["connectionId"]["S"] == connection_id
-    assert items[0].get("lobbyId") is None
+    def test_start_lobby(
+        self,
+        dynamo_client: DynamoDBClient,
+        management_api_client: MagicMock,
+    ):
+        """
+        Test that starting a lobby sets the connection as a host and sends a 'lobby started' event
+        back to the host.
+        """
+        connection_id = "myConnection"
 
-    created_lobby_id = actions.start_lobby(connection_id, management_api_client)
-    items = utils.get_all_dynamo_items(dynamo_client)
-    assert len(items) == 1
-    assert items[0]["lobbyId"]["S"] == created_lobby_id
-    assert created_lobby_id is not None
-    assert items[0].get("isHost")
+        actions.add_connection(connection_id)
+        items = utils.get_all_dynamo_items(dynamo_client)
+        assert len(items) == 1
+        assert items[0]["connectionId"]["S"] == connection_id
+        assert items[0].get("lobbyId") is None
 
-    expected_event_response = payloads.generate_lobby_started_event(created_lobby_id)
-    management_api_client.post_to_connection.assert_called_once_with(
-        ConnectionId=connection_id, Data=expected_event_response
-    )
+        created_lobby_id = actions.start_lobby(connection_id, management_api_client)
+        items = utils.get_all_dynamo_items(dynamo_client)
+        assert len(items) == 1
+        assert items[0]["lobbyId"]["S"] == created_lobby_id
+        assert created_lobby_id is not None
+        assert items[0].get("isHost")
 
+        expected_event_response = payloads.generate_lobby_started_event(
+            created_lobby_id
+        )
+        management_api_client.post_to_connection.assert_called_once_with(
+            ConnectionId=connection_id, Data=expected_event_response
+        )
 
-def test_close_lobby(
-    dynamo_client: DynamoDBClient,
-    management_api_client: MagicMock,
-):
-    """
-    Test that closing a lobby removes the lobby ID and host status from the connection.
-    """
-    connection_id = "myConnection"
-    actions.add_connection(connection_id)
-    created_lobby_id = actions.start_lobby(connection_id, management_api_client)
+    def test_start_lobby_custom_name(
+        self, dynamo_client: DynamoDBClient, management_api_client: MagicMock
+    ):
+        """
+        Test that starting a lobby with a custom name sets the connection as a host and sends a 'lobby started' event
+        back to the host.
+        """
+        connection_id = "myConnection"
+        custom_lobby_id = "custom_lobby_id"
+        actions.add_connection(connection_id)
+        created_lobby_id = actions.start_lobby(
+            connection_id, management_api_client, lobby_id=custom_lobby_id
+        )
 
-    items = utils.get_all_dynamo_items(dynamo_client)
-    assert len(items) == 1
-    assert items[0]["lobbyId"]["S"] == created_lobby_id
-    assert items[0]["isHost"]["BOOL"]
+        assert created_lobby_id == custom_lobby_id
+        items = utils.get_all_dynamo_items(dynamo_client)
+        assert items[0]["lobbyId"]["S"] == created_lobby_id
 
-    actions.close_lobby(connection_id)
-    items = utils.get_all_dynamo_items(dynamo_client)
-    assert len(items) == 1
-    assert "lobbyId" not in items[0]
-    assert "isHost" not in items[0]
+        expected_event_response = payloads.generate_lobby_started_event(
+            created_lobby_id
+        )
+        management_api_client.post_to_connection.assert_called_once_with(
+            ConnectionId=connection_id, Data=expected_event_response
+        )
+
+    def test_start_lobby_existing_name(
+        self, dynamo_client: DynamoDBClient, management_api_client: MagicMock
+    ):
+        """
+        Test that starting a lobby with a name that already exists fails
+        """
+        connection_id_a = "myConnectionA"
+        connection_id_b = "myConnectionB"
+        custom_lobby_id = "custom_lobby_id"
+        actions.add_connection(connection_id_a)
+        actions.add_connection(connection_id_b)
+        created_lobby_id = actions.start_lobby(
+            connection_id_a, management_api_client, lobby_id=custom_lobby_id
+        )
+
+        expected_success_event = payloads.generate_lobby_started_event(custom_lobby_id)
+        management_api_client.post_to_connection.assert_called_with(
+            ConnectionId=connection_id_a, Data=expected_success_event
+        )
+
+        # try for a second time
+        second_created_lobby_id = actions.start_lobby(
+            connection_id_b, management_api_client, lobby_id=custom_lobby_id
+        )
+        assert second_created_lobby_id is None
+
+        expected_failure_event = payloads.generate_lobby_creation_failed_event(
+            f"Lobby {custom_lobby_id} already exists."
+        )
+        management_api_client.post_to_connection.assert_called_with(
+            ConnectionId=connection_id_b, Data=expected_failure_event
+        )
+
+    def test_close_lobby(
+        self,
+        dynamo_client: DynamoDBClient,
+        management_api_client: MagicMock,
+    ):
+        """
+        Test that closing a lobby removes the lobby ID and host status from the connection.
+        """
+        connection_id = "myConnection"
+        actions.add_connection(connection_id)
+        created_lobby_id = actions.start_lobby(connection_id, management_api_client)
+
+        items = utils.get_all_dynamo_items(dynamo_client)
+        assert len(items) == 1
+        assert items[0]["lobbyId"]["S"] == created_lobby_id
+        assert items[0]["isHost"]["BOOL"]
+
+        actions.close_lobby(connection_id)
+        items = utils.get_all_dynamo_items(dynamo_client)
+        assert len(items) == 1
+        assert "lobbyId" not in items[0]
+        assert "isHost" not in items[0]
 
 
 class TestJoinLobby:
@@ -71,6 +137,7 @@ class TestJoinLobby:
 
         host_connection = "hostConnection"
         created_lobby_id = actions.start_lobby(host_connection, management_api_client)
+        assert created_lobby_id
 
         guest_connection = "guestConnection"
         actions.add_connection(guest_connection)
@@ -103,6 +170,7 @@ class TestJoinLobby:
         host_connection = "hostConnection"
         actions.add_connection(host_connection)
         lobby_id = actions.start_lobby(host_connection, management_api_client)
+        assert lobby_id
 
         actions.request_join_lobby("guestConnection", lobby_id, management_api_client)
         actions.remove_connection(host_connection)

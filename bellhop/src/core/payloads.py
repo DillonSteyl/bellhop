@@ -16,6 +16,7 @@ class ActionType(StrEnum):
 
 class EventType(StrEnum):
     LOBBY_STARTED = "lobby_started"
+    LOBBY_CREATION_FAILED = "lobby_creation_failed"
     RECEIVED_JOIN_REQUEST = "received_join_request"
     JOIN_REQUEST_ACCEPTED = "join_request_accepted"
     JOIN_REQUEST_REJECTED = "join_request_rejected"
@@ -59,6 +60,15 @@ class SendICECandidateContent:
     media: str
     index: int
     name: str
+
+
+def generate_lobby_creation_failed_event(reason: str) -> str:
+    return json.dumps(
+        {
+            "event": EventType.LOBBY_CREATION_FAILED,
+            "content": {"reason": reason},
+        }
+    )
 
 
 def generate_lobby_started_event(lobby_id: str) -> str:
