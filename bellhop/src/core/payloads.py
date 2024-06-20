@@ -31,6 +31,11 @@ class WebsocketPayload:
 
 
 @dataclass
+class StartLobbyContent:
+    lobby_id: Optional[str] = None
+
+
+@dataclass
 class JoinLobbyContent:
     lobby_id: str
 

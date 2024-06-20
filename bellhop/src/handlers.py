@@ -42,9 +42,11 @@ def handle_payload(event: APIGatewayProxyEvent, context: LambdaContext):
 
     match payload.action:
         case payloads.ActionType.START_LOBBY:
+            start_lobby_content = payloads.StartLobbyContent(**content)
             actions.start_lobby(
                 connection_id=source_connection_id,
                 management_api_client=management_api_client,
+                lobby_id=start_lobby_content.lobby_id,
             )
         case payloads.ActionType.CLOSE_LOBBY:
             actions.close_lobby(connection_id=source_connection_id)
