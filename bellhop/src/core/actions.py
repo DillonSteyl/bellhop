@@ -103,7 +103,12 @@ def request_join_lobby(
         ExpressionAttributeValues={":lobby_id": {"S": lobby_id}},
     )
     if not lobby_connections["Items"]:
-        raise RuntimeError(f"Lobby {lobby_id} not found.")
+        reject_join_request(
+            player_connection_id=connection_id,
+            reason=f"Lobby '{lobby_id}' not found.",
+            management_api_client=management_api_client,
+        )
+        return
 
     host_id = None
     for item in lobby_connections["Items"]:
@@ -112,7 +117,12 @@ def request_join_lobby(
             host_id = item["connectionId"]["S"]
 
     if not host_id:
-        raise RuntimeError(f"No host found for lobby {lobby_id}.")
+        reject_join_request(
+            player_connection_id=connection_id,
+            reason=f"No host found for lobby '{lobby_id}'.",
+            management_api_client=management_api_client,
+        )
+        return
 
     dynamo_db.update_item(
         TableName=TABLE_NAME,

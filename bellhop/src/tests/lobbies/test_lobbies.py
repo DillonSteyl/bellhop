@@ -157,10 +157,16 @@ class TestJoinLobby:
         dynamo_client: DynamoDBClient,
         management_api_client: MagicMock,
     ):
-        with pytest.raises(RuntimeError):
-            actions.request_join_lobby(
-                "connection", "nonexistant_lobby", management_api_client
-            )
+        actions.request_join_lobby(
+            "connection", "nonexistant_lobby", management_api_client
+        )
+
+        expected_reject_event = payloads.generate_join_request_rejected_event(
+            "Lobby 'nonexistant_lobby' not found."
+        )
+        management_api_client.post_to_connection.assert_called_with(
+            ConnectionId="connection", Data=expected_reject_event
+        )
 
     def test_join_lobby_no_host(
         self,
@@ -174,10 +180,14 @@ class TestJoinLobby:
 
         actions.request_join_lobby("guestConnection", lobby_id, management_api_client)
         actions.remove_connection(host_connection)
-        with pytest.raises(RuntimeError):
-            actions.request_join_lobby(
-                "guestConnection2", lobby_id, management_api_client
-            )
+        actions.request_join_lobby("guestConnection2", lobby_id, management_api_client)
+
+        expected_reject_event = payloads.generate_join_request_rejected_event(
+            f"No host found for lobby '{lobby_id}'."
+        )
+        management_api_client.post_to_connection.assert_called_with(
+            ConnectionId="guestConnection2", Data=expected_reject_event
+        )
 
 
 class TestJoinRequestResponses:
